@@ -1,0 +1,35 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+xmlns:beans="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd">
+	<http use-expressions="false" pattern="/**">
+		<intercept-url pattern="/loginPage" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/static1/**" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/**" access="ROLE_USER" />
+		<intercept-url pattern="/admin/**" access="ROLE_ADMIN" />
+		<!-- login-page：渲染登录的页面 
+			 authentication-failure-url:认证失败后的跳转页面 
+			 login-processing-url:登录请求处理路径,也就是form表单提交时指定的action
+			 default-target-url：认证成功后，如果用户之前请求受保护的资源重定向到登录页面，
+			   	那么认证成功后跳转到用户请求的那个受保护的资源， 否则跳转到default-target-url属性配置的页面
+			   	如果本属性没有指定， 那么跳转到应用首页 
+    		 username-parameter,password-parameter：指定登录login-page配置的页面中用户名和密码的name 
+		 	 always-use-default-target:登录成功后永远重定向到默认页面， 而不是用户之前请求的页面 -->
+		<form-login 
+					authentication-failure-handler-ref="myAuthenctiationFailureHandler"
+					authentication-success-handler-ref="myAuthenctiationSuccessHandler"
+					username-parameter="account" password-parameter="password"/>
+		<logout logout-url="/logout.html"/>
+		<csrf disabled="true"/>
+	</http>
+	<authentication-manager>
+		<authentication-provider user-service-ref="userDetailsServerImpl">
+		</authentication-provider>
+	</authentication-manager>
+	<beans:bean id="userDetailsServerImpl" class="com.hysz.login.component.UserDetailsServerImpl"></beans:bean>
+	<beans:bean id="myAuthenctiationSuccessHandler" class="com.hysz.login.component.MyAuthenctiationSuccessHandler"></beans:bean>
+	<beans:bean id="myAuthenctiationFailureHandler" class="com.hysz.login.component.MyAuthenctiationFailureHandler"></beans:bean>
+</beans:beans>
